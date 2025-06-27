@@ -1,0 +1,73 @@
+/* Ensure the body and html take full height */
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: Arial, sans-serif;
+  line-height: 1.6;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Header */
+.header {
+  display: flex;
+  background: #2c3e50;
+  color: white;
+  padding: 10px;
+  justify-content: center;
+  height: 60px;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+/* Main Content */
+main {
+  padding: 2rem;
+  text-align: center;
+  flex: 1;  /* This makes the main content take up remaining space */
+}
+
+main h2 {
+  margin-bottom: 1rem;
+}
+
+/* Swiper Carousel */
+.swiper {
+  width: 100%;
+  max-width: 1050px;
+  margin: 2rem auto;
+  padding: 50px;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: darkblue;
+  height: 200px;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  background-color: rgba(255, 255, 255, 0.3); /* Adjust color and opacity */
+    background-blend-mode: overlay;
+}
+.swiper-slide:hover {
+  transform: scale(1.05);
+  box-shadow: 0 8px 10px lightgray;
+  cursor: pointer;
+}
+
+/* Footer */
+.footer {
+  background: #34495e;
+  color: white;
+  text-align: center;
+  height: 50px;
+  padding: 10px;
+  width: 100%;
+  z-index: 90;
+  margin-top: auto; /* Ensures footer is pushed to the bottom */
+}

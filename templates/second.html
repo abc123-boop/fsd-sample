@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Global Temperature Indicators</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <link rel="stylesheet" href="static\css\second.css" />
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  </head>
+
+  <body>
+    <div class="header"><h1>Climate Change Awareness</h1></div>
+    <div class="breadcrumb-bar">
+      <div class="path">
+        {% for item in breadcrumb %}
+        <a href="{{ item.url }}">{{ item.name }}</a>
+        {% if not loop.last %} &gt; {% endif %} {% endfor %}
+      </div>
+      <div class="contact-info">
+        Contact us:
+        <a href="mailto:info@climatechange.com">info@climatechange.com</a>
+      </div>
+    </div>
+    <h1>Temperature Trends</h1>
+    <div class="container">
+      <div class="item">
+        <h2>Global Temperature Trends</h2>
+        <p>
+          Select a year on the slider to compare changes in temperature
+          globally.
+        </p>
+        <div id="choroplethContainer"></div>
+        <div class="small_container">
+          <input
+            type="range"
+            id="yearSlider"
+            min="1960"
+            max="2023"
+            value="2023"
+            step="1"
+          />
+          <p>Year: <span id="sliderValue">2023</span></p>
+        </div>
+
+        <div class="big_container">
+          <div class="item" style="box-shadow: 0 0 0 0">
+            <p style="font-size: 25px; font-weight: bold">
+              Some observations from the visualization:
+            </p>
+            <ul>
+              <li>
+                There is a clear upward trend in global temperatures over the
+                last few decades, with several years showing record-high
+                temperatures.
+              </li>
+              <li>
+                The increase in temperature correlates with more frequent and
+                intense heatwaves, droughts, and heavy rainfall events in
+                certain regions.
+              </li>
+              <li>
+                Warming is not uniform; some areas, particularly urban regions,
+                experience more pronounced temperature increases due to the
+                urban heat island effect.
+              </li>
+            </ul>
+            <p style="font-size: 25px; font-weight: bold">
+              Remedies you can practice:
+            </p>
+            <ul>
+              <li>
+                Mitigating greenhouse gas emissions by switching to public
+                transport, using renewable sources of energy, actively
+                monitoring carbon footprint.
+              </li>
+              <li>
+                Building resilient infrastructure to protect against extreme
+                climate changes.
+              </li>
+              <li>Adopting reduce, reuse, recycle principle.</li>
+            </ul>
+          </div>
+          <div class="item">
+            <!--Text-->
+            <h2>Country-wise Temperature Trends</h2>
+            <p>
+              Select a country to view its changes in temperature over the years
+              1960-2023.
+            </p>
+            <select id="countryDropdown">
+              <option value="">--input country--</option>
+            </select>
+            <div id="plotContainer"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2025 Climate Change Initiative. All Rights Reserved.</p>
+    </div>
+
+    <script>
+      async function fetchCountries() {
+        const response = await fetch("/countries");
+        const countries = await response.json();
+        const dropdown = document.getElementById("countryDropdown");
+        countries.forEach((country) => {
+          const option = document.createElement("option");
+          option.value = country;
+          option.textContent = country;
+          dropdown.appendChild(option);
+        });
+      }
+
+      async function fetchChoropleth(year) {
+        const response = await fetch(`/choropleth?year=${year}`);
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot("choroplethContainer", graph.data, graph.layout);
+      }
+
+      async function fetchPlot(country) {
+        const response = await fetch("/plot", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ country }),
+        });
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot("plotContainer", graph.data, graph.layout);
+      }
+
+      document.getElementById("yearSlider").addEventListener("input", (e) => {
+        const year = e.target.value;
+        document.getElementById("sliderValue").textContent = year;
+        fetchChoropleth(year);
+      });
+
+      document
+        .getElementById("countryDropdown")
+        .addEventListener("change", (e) => {
+          const country = e.target.value;
+          if (country) fetchPlot(country);
+        });
+
+      fetchCountries();
+      fetchChoropleth(2023);
+    </script>
+  </body>
+</html>

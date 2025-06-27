@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CO2 Levels Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link rel="stylesheet" href="static/css/second.css" />
+  </head>
+  <body>
+    <div class="header"><h1>Climate Change Awareness</h1></div>
+    <div class="breadcrumb-bar">
+      <div class="path">
+        {% for item in breadcrumb %}
+        <a href="{{ item.url }}">{{ item.name }}</a>
+        {% if not loop.last %} &gt; {% endif %} {% endfor %}
+      </div>
+      <div class="contact-info">
+        Contact us:
+        <a href="mailto:info@climatechange.com">info@climatechange.com</a>
+      </div>
+    </div>
+    <!---->
+    <h1>CO<sub>2</sub> Trends</h1>
+    <div class="container">
+      <div class="item">
+        <h2>Global Average CO<sub>2</sub> levels</h2>
+        <button id="fetchBarChart">Generate Bar Chart</button>
+        <div id="barChartContainer"></div>
+
+        <div>
+          <div class="big_container">
+            <div class="item" style="box-shadow: 0 0 0 0">
+              <p style="font-size: 25px; font-weight: bold">
+                Some observations from the visualization:
+              </p>
+              <ul>
+                <li>
+                  CO2 levels have been steadily rising since the late 1950s.
+                  This increase is observed year after year, with significant
+                  spikes due to industrialization, increased fossil fuel
+                  consumption, and deforestation.
+                </li>
+                <li>
+                  Monthly CO2 levels show seasonal fluctuations, typically
+                  higher in winter months due to heating needs and lower in
+                  summer months as plant growth absorbs more CO2.
+                </li>
+                <li>
+                  The bar chart of yearly mean CO2 levels clearly shows the
+                  persistent rise in concentration levels, reaching new peaks
+                  each year.
+                </li>
+              </ul>
+              <p style="font-size: 25px; font-weight: bold">
+                Remedies you can practice:
+              </p>
+              <ul>
+                <li>
+                  Implementing energy-efficient technologies in homes,
+                  businesses, and industries to reduce the overall energy
+                  demand.
+                </li>
+                <li>
+                  Developing and scaling up carbon capture technologies that
+                  remove CO2 directly from the air or prevent emissions from
+                  industrial sources.
+                </li>
+                <li>
+                  Shifting away from fossil fuels by investing in renewable
+                  energy sources such as solar, wind, and geothermal.
+                </li>
+              </ul>
+            </div>
+            <div class="item">
+              <!--Text-->
+              <h2>Monthly CO<sub>2</sub> Levels for Selected Year</h2>
+              <p>Select a year to view the monthly trends in CO2 levels.</p>
+              <input
+                type="number"
+                id="yearInput"
+                value="2023"
+                min="1958"
+                max="2024"
+              /><br /><br />
+              <button id="fetchLineGraph">Generate Line Graph</button>
+              <div id="lineGraphContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>&copy; 2025 Climate Change Initiative. All Rights Reserved.</p>
+    </div>
+
+    <!---->
+
+    <script>
+      async function fetchLineGraph(year) {
+        const response = await fetch(`/co2_line_graph?year=${year}`);
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot("lineGraphContainer", graph.data, graph.layout);
+      }
+
+      async function fetchBarChart() {
+        const response = await fetch("/co2_bar_chart");
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot("barChartContainer", graph.data, graph.layout);
+      }
+
+      document
+        .getElementById("fetchLineGraph")
+        .addEventListener("click", () => {
+          const year = document.getElementById("yearInput").value;
+          fetchLineGraph(year);
+        });
+
+      document.getElementById("fetchBarChart").addEventListener("click", () => {
+        fetchBarChart();
+      });
+    </script>
+  </body>
+</html>

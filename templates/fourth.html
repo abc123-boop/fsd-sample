@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sea Level Analysis</title>
+    <script src="https://cdn.plot.ly/plotly-2.24.1.min.js"></script>
+    <link rel="stylesheet" href="static/css/fourth.css" />
+    <style>
+      #seaLevelVsDayGraphContainer {
+        width: 60%;
+      }
+      #meanSeaLevelBarChartContainer {
+        justify-self: center;
+        width: 70%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="header">
+      <h1>Climate Change Awareness</h1>
+    </div>
+    <div class="breadcrumb-bar">
+      <div class="path">
+        {% for item in breadcrumb %}
+        <a href="{{ item.url }}">{{ item.name }}</a>
+        {% if not loop.last %} &gt; {% endif %} {% endfor %}
+      </div>
+      <div class="contact-info">
+        Contact us:
+        <a href="mailto:info@climatechange.com">info@climatechange.com</a>
+      </div>
+    </div>
+    <!---->
+    <h1>Sea Level Trends</h1>
+    <div class="container">
+      <div class="item">
+        <h2>Yearly Mean Sea Levels</h2>
+        <div class="year-selection">
+          <p>Select a Year to View Mean Sea Levels for All Seas</p>
+          <input
+            type="number"
+            id="yearInput"
+            value="1992"
+            min="1992"
+            max="1995"
+          /><br /><br />
+          <button id="fetchMeanSeaLevelBarChart">
+            Generate Mean Sea Level Bar Chart
+          </button>
+        </div>
+        <div id="meanSeaLevelBarChartContainer"></div>
+        <div>
+          <div class="big_container">
+            <div class="item" style="box-shadow: 0 0 0 0">
+              <p style="font-size: 25px; font-weight: bold">
+                Some observations from the visualization:
+              </p>
+              <ul>
+                <li>
+                  The overall trend shows a steady rise in global mean sea
+                  levels over recent decades, largely attributed to thermal
+                  expansion of seawater and melting ice caps.
+                </li>
+                <li>
+                  The polar regions, especially the Arctic and parts of
+                  Antarctica, have been experiencing more dramatic sea level
+                  rise due to faster melting of ice sheets and glaciers.
+                </li>
+                <li>
+                  Rising sea levels exacerbate the effects of storm surges,
+                  leading to more frequent and severe coastal flooding. Extreme
+                  weather events such as hurricanes and typhoons can further
+                  intensify coastal inundation.
+                </li>
+              </ul>
+              <p style="font-size: 25px; font-weight: bold">
+                Remedies you can practice:
+              </p>
+              <ul>
+                <li>
+                  Investing in constructing and upgrading infrastructure like
+                  sea walls, flood barriers, and levees to protect low-lying
+                  coastal areas from rising seas.
+                </li>
+                <li>
+                  Rehabilitate ecosystems like mangroves, wetlands, and coral
+                  reefs which act as natural buffers against coastal erosion and
+                  help reduce the impact of rising sea levels on coastal
+                  communities.
+                </li>
+                <li>
+                  Implement adaptive coastal management strategies that take
+                  into account future sea level projections, ensuring that
+                  coastal communities can respond dynamically to changing sea
+                  levels.
+                </li>
+              </ul>
+            </div>
+
+            <div class="item">
+              <div class="sea-selection">
+                <h2>Sea-wise Trends</h2>
+                <p>
+                  Select a sea to observe recorded sea levels from 1992-1995.
+                </p>
+                <select id="seaName"></select
+                ><br /><br />
+                <button id="fetchSeaLevelVsDayGraph">
+                  Generate Sea Level vs Day Graph
+                </button>
+              </div>
+              <div id="seaLevelVsDayGraphContainer"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!---->
+
+    <div class="footer">
+      <p>&copy; 2025 Climate Change Initiative. All Rights Reserved.</p>
+    </div>
+
+    <script>
+      // Fetch available seas for the dropdown
+      fetch("/seas")
+        .then((response) => response.json())
+        .then((data) => {
+          const seaSelect = document.getElementById("seaName");
+          data.seas.forEach((sea) => {
+            const option = document.createElement("option");
+            option.value = sea;
+            option.textContent = sea;
+            seaSelect.appendChild(option);
+          });
+        });
+
+      // Fetch and plot the mean sea level bar chart for a specific year
+      async function fetchMeanSeaLevelBarChart(year) {
+        const response = await fetch(`/mean_sea_levels_for_year?year=${year}`);
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot(
+          "meanSeaLevelBarChartContainer",
+          graph.data,
+          graph.layout
+        );
+      }
+
+      // Fetch and plot the sea level vs day graph for a specific sea
+      async function fetchSeaLevelVsDayGraph(seaName) {
+        const response = await fetch(`/sea_level_vs_day?seaName=${seaName}`);
+        const data = await response.json();
+        const graph = JSON.parse(data.plot);
+        Plotly.newPlot("seaLevelVsDayGraphContainer", graph.data, graph.layout);
+      }
+
+      // Event listener for generating mean sea level bar chart
+      document
+        .getElementById("fetchMeanSeaLevelBarChart")
+        .addEventListener("click", () => {
+          const year = document.getElementById("yearInput").value;
+          fetchMeanSeaLevelBarChart(year);
+        });
+
+      // Event listener for generating sea level vs day graph
+      document
+        .getElementById("fetchSeaLevelVsDayGraph")
+        .addEventListener("click", () => {
+          const seaName = document.getElementById("seaName").value;
+          fetchSeaLevelVsDayGraph(seaName);
+        });
+    </script>
+  </body>
+</html>

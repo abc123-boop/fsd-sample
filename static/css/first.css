@@ -8,6 +8,12 @@ html, body {
   flex-direction: column;
 }
 
+.visit-stats {
+  font-size: 14px;
+  color: gray;
+  margin-top: 10px;
+}
+
 /* Header */
 .header {
   display: flex;

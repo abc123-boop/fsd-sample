@@ -17,6 +17,11 @@ h1 {
   margin: 10px auto;
 }
 
+.visit-stats {
+  font-size: 14px;
+  color: gray;
+  margin-top: 10px;
+}
 
 .header,
 .footer {

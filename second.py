@@ -8,6 +8,15 @@ import numpy as np
 from datetime import datetime
 import pandas as pd
 
+from pymongo import MongoClient
+
+# MongoDB setup – change only the URI below if needed
+MONGO_URI = "mongodb+srv://climate_user:abcdefg@cluster0.i51gz5r.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"  # or your MongoDB Atlas URI
+client = MongoClient(MONGO_URI)
+db = client["climatedb"]
+stats_collection = db["stats"]
+
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key' 
 
@@ -30,13 +39,17 @@ def add_to_breadcrumb(name, endpoint):
 
 @app.route("/")
 def index():
+    log_page_visit('index')
+    count = get_visit_count('index')
     session['breadcrumb'] = [{'name': 'Home', 'url': url_for('index')}]
-    return render_template("first.html", breadcrumb=session['breadcrumb'])
+    return render_template("first.html", breadcrumb=session['breadcrumb'], visit_count=count)
 
 @app.route("/second")
 def second():
+    log_page_visit('second')
+    count = get_visit_count('second')
     add_to_breadcrumb('Temperature Trends', 'second')
-    return render_template("second.html", breadcrumb=session['breadcrumb'])
+    return render_template("second.html", breadcrumb=session['breadcrumb'], visit_count=count)
 
 @app.route("/countries")
 def get_countries():
@@ -155,8 +168,10 @@ def plot_country_data():
 
 @app.route("/third")
 def co2_page():
+    log_page_visit('third')
+    count = get_visit_count('third')
     add_to_breadcrumb('CO2 Levels', 'co2_page')
-    return render_template("third.html", breadcrumb=session['breadcrumb'])
+    return render_template("third.html", breadcrumb=session['breadcrumb'], visit_count=count)
 
 @app.route("/co2_line_graph", methods=["GET"])
 def co2_line_graph():
@@ -280,8 +295,10 @@ def co2_bar_chart():
 
 @app.route("/fourth")
 def sea_change():
+    log_page_visit('fourth')
+    count = get_visit_count('fourth')
     add_to_breadcrumb('Sea Level Trends', 'sea_change')
-    return render_template("fourth.html", breadcrumb=session['breadcrumb'])
+    return render_template("fourth.html", breadcrumb=session['breadcrumb'], visit_count=count)
 
 
 @app.route("/mean_sea_levels_for_year", methods=["GET"])
@@ -454,6 +471,18 @@ def seas():
 
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+from datetime import datetime
+
+def log_page_visit(page_name):
+    stats_collection.insert_one({
+        "page": page_name,
+        "visited_at": datetime.now()
+    })
+
+def get_visit_count(page_name):
+    return stats_collection.count_documents({"page": page_name})
+
 
 
 if __name__ == "__main__":

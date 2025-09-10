@@ -75,7 +75,7 @@ def get_choropleth():
         response.raise_for_status()
         data = response.json()
 
-        year = request.args.get("year", "2023")
+        year = request.args.get("year", "2025")
         year_field = f"F{year}"
 
         country_data = []
@@ -176,7 +176,7 @@ def co2_page():
 @app.route("/co2_line_graph", methods=["GET"])
 def co2_line_graph():
     try:
-        year = request.args.get("year", "2023")  # Default to 2023 if no year is provided
+        year = request.args.get("year", "2025")  # Default to 2023 if no year is provided
         response = requests.get(API_URL_CO2)
         response.raise_for_status()
         data = response.json()
